@@ -54,7 +54,7 @@ my\_flask\_app/
    ```bash
    git clone <repo-url> my_flask_app
    cd my_flask_app
-````
+
 
 2. **Create & activate Python venv**
 
