@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Submit Your Info</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0; padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      border-radius: 8px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    form label {
+      display: block;
+      margin-bottom: 15px;
+    }
+    form input[type="text"],
+    form input[type="email"] {
+      width: 100%;
+      padding: 8px 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #28a745;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+    .view-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .view-link a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .view-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Enter Your Information</h1>
+    <form action="/submit" method="post">
+      <label>
+        Name:
+        <input type="text" name="name" placeholder="Your name" required>
+      </label>
+      <label>
+        Email:
+        <input type="email" name="email" placeholder="you@example.com" required>
+      </label>
+      <button type="submit">Submit</button>
+    </form>
+    <div class="view-link">
+      <a href="/view">View All Submissions</a>
+    </div>
+  </div>
+</body>
+</html>
