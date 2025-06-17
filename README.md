@@ -134,6 +134,6 @@ Open your browser and navigate to:
 
 ## 👤 Author
 
-Your Name – <[your\_email@example.com](mailto:your_email@example.com)>
+Your Name – Rachit Jain (94260)
 
-Feel free to adapt, extend, and integrate this example into larger projects!
+
