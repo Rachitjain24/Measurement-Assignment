@@ -1,48 +1,59 @@
-from flask import Flask, request, render_template, abort
-import subprocess
+from flask import Flask, render_template, request, redirect, url_for
+import os, numpy as np
 
 app = Flask(__name__)
+DATA_FILE = "data.txt"
+
+def read_data():
+    Vs, Is = [], []
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE) as f:
+            for line in f:
+                try:
+                    v, i = line.strip().split(',')
+                    Vs.append(float(v)); Is.append(float(i))
+                except ValueError:
+                    continue
+    return np.array(Vs), np.array(Is)
 
 @app.route('/')
 def index():
-    # Render the HTML form
     return render_template('index.html')
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    # Collect form data
-    name  = request.form.get('name', '')
-    email = request.form.get('email', '')
+    V = request.form.get('voltage', type=float)
+    I = request.form.get('current', type=float)
+    with open(DATA_FILE, 'a') as f:
+        f.write(f"{V},{I}\n")
+    return redirect(url_for('results'))
 
-    # Invoke the Perl processor, passing form data on stdin
-    proc = subprocess.run(
-        ['perl', 'scripts/process.pl'],
-        input=f"name={name}&email={email}",
-        capture_output=True,
-        text=True,
+@app.route('/results')
+def results():
+    Vs, Is = read_data()
+    # pack for Chart.js
+    points = [{"x": float(v), "y": float(i)} for v, i in zip(Vs, Is)]
+
+    slope = intercept = err_slope = err_intercept = None
+
+    if Vs.size >= 2:
+        # best‐fit line
+        m, b = np.polyfit(Vs, Is, 1)
+        slope, intercept = float(m), float(b)
+        # only compute covariance (errors) if you have >2 points
+        if Vs.size > 2:
+            _, cov = np.polyfit(Vs, Is, 1, cov=True)
+            err_slope, err_intercept = map(float, np.sqrt(np.diag(cov)))
+
+    return render_template(
+        'results.html',
+        points=points,
+        slope=slope,
+        intercept=intercept,
+        err_slope=err_slope,
+        err_intercept=err_intercept
     )
-
-    # If the Perl script failed, return a 500 with stderr
-    if proc.returncode != 0:
-        return abort(500, f"Error running process.pl:\n{proc.stderr}")
-
-    # Otherwise return its stdout (the generated HTML)
-    return proc.stdout
-
-@app.route('/view')
-def view():
-    # Invoke the Perl viewer to render the table
-    proc = subprocess.run(
-        ['perl', 'scripts/view.pl'],
-        capture_output=True,
-        text=True,
-    )
-
-    if proc.returncode != 0:
-        return abort(500, f"Error running view.pl:\n{proc.stderr}")
-
-    return proc.stdout
 
 if __name__ == '__main__':
-    # Run on all interfaces, port 5000, with debug enabled
-    app.run(host='0.0.0.0', port=3500, debug=True)
+    open(DATA_FILE, 'a').close()
+    app.run(host='0.0.0.0', port=5000, debug=True)
